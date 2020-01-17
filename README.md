@@ -1,4 +1,4 @@
-# The-maze-of-Waze 2
+# The maze of Waze 2
 Practicing in building a navigation program
 
 
