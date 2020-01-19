@@ -38,16 +38,16 @@ public class MyGameGUI extends JFrame implements MouseListener {
     game_service game;
     List<String> fruits = new ArrayList<>();
     List<String> robots = new ArrayList<>();
-    int players ;
+    int players;
     HashMap<Point3D, Integer> path = new HashMap<>();
     Integer id = null;
     Thread thread;
     public static final double EPS = 0.0001;
-    private Range rx = new Range(Integer.MAX_VALUE,Integer.MIN_VALUE);
-    private Range ry = new Range(Integer.MAX_VALUE,Integer.MIN_VALUE);
+    private Range rx = new Range(Integer.MAX_VALUE, Integer.MIN_VALUE);
+    private Range ry = new Range(Integer.MAX_VALUE, Integer.MIN_VALUE);
     int scenario;
     RunGame rg;
-    boolean Auto ;
+    boolean Auto;
     boolean Manu;
     boolean EndAuto;
     boolean EndManu;
@@ -55,8 +55,7 @@ public class MyGameGUI extends JFrame implements MouseListener {
 
 
     /**
-     *
-     *   constructor for gui without any parameter
+     * constructor for gui without any parameter
      */
 
     public MyGameGUI() {                                       //starting without a loaded graph
@@ -71,9 +70,9 @@ public class MyGameGUI extends JFrame implements MouseListener {
 
 
     }
+
     /**
-     *
-     *   constructor for gui with graph parameter
+     * constructor for gui with graph parameter
      */
 
     public MyGameGUI(graph g) {                              //starting with a loaded graph
@@ -95,12 +94,11 @@ public class MyGameGUI extends JFrame implements MouseListener {
 
 
     }
+
     /**
-     *
-     *   initiate the GUI components:
-     *   File tab
-     *   Driving robots tab
-     *
+     * initiate the GUI components:
+     * File tab
+     * Driving robots tab
      */
 
     public void initComponents() {                          //creating the tabs of the GUI
@@ -144,13 +142,13 @@ public class MyGameGUI extends JFrame implements MouseListener {
 
         menuFrame.add(robotsMenu);
     }
+
     /**
-     *
-     *  Activating the Functions in each tab
-     *  Open graph
-     *  save graph
-     *  save png of graph
-     *  save KMl to file
+     * Activating the Functions in each tab
+     * Open graph
+     * save graph
+     * save png of graph
+     * save KMl to file
      */
 
     public void actionsGui() {                  //After user chose an option the GUI option will execute the option here
@@ -176,7 +174,7 @@ public class MyGameGUI extends JFrame implements MouseListener {
         saveKmlItem.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-              SaveKML();
+                SaveKML();
             }
 
         });
@@ -205,15 +203,16 @@ public class MyGameGUI extends JFrame implements MouseListener {
 
     /**
      * Save KML file using KML logger
-     *
      */
     private void SaveKML() {
-
-        KML_Save(this.gra,robots,fruits);
+        for (int i = 0; i <= 23; i++) {
+            Scenario s = new Scenario(i); // you have [0,23] games
+            KML_Save(s);
+        }
     }
+
     /**
      * Activating 'drive robot manual'
-     *
      */
     private void manualDrive() {
         try {
@@ -221,14 +220,13 @@ public class MyGameGUI extends JFrame implements MouseListener {
             s.game.startGame();
             manuDrive();
 
-        }catch(Exception ex){
+        } catch (Exception ex) {
             ex.printStackTrace();
         }
     }
 
     /**
      * Activating 'drive robot automatic'
-     *
      */
     private void automaticDrive() {
         Auto = true;
@@ -237,9 +235,9 @@ public class MyGameGUI extends JFrame implements MouseListener {
         ThreadPaintAuto(rg.scenario.game);
 
     }
+
     /**
      * Saving the graph/status as png file
-     *
      */
     private void savePng() {
         try {
@@ -254,9 +252,9 @@ public class MyGameGUI extends JFrame implements MouseListener {
             e.printStackTrace();
         }
     }
+
     /**
      * load graph using serializable number from txt file
-     *
      */
     public void readFileDialog() {
         FileDialog fd = new FileDialog(this, "Open text file", FileDialog.LOAD);
@@ -284,9 +282,9 @@ public class MyGameGUI extends JFrame implements MouseListener {
             System.out.println("No file was loaded");
         }
     }
+
     /**
      * Save graph using serializable number to txt file
-     *
      */
     public void writeFileDialog() {                                                   //write the graph into a file using serializable
         FileDialog fd = new FileDialog(this, "Save the text file", FileDialog.SAVE);
@@ -314,21 +312,23 @@ public class MyGameGUI extends JFrame implements MouseListener {
         }
 
     }
+
     /**
-     *   coordinate to be scaled to x range
+     * coordinate to be scaled to x range
      */
 
     public double rangeX(double d) {
-        double outX = (d - rx.get_min())/(rx.get_max() - rx.get_min());
-        double x = 100*(12 * outX + 1);
+        double outX = (d - rx.get_min()) / (rx.get_max() - rx.get_min());
+        double x = 100 * (12 * outX + 1);
         return x;
     }
+
     /**
-     *   coordinate to be scaled to y range
+     * coordinate to be scaled to y range
      */
     public double rangeY(double d) {
-        double outY = (d - ry.get_min())/(ry.get_max() - ry.get_min());
-        double y = 400*(1-outY)+100;
+        double outY = (d - ry.get_min()) / (ry.get_max() - ry.get_min());
+        double y = 400 * (1 - outY) + 100;
         return y;
     }
 
@@ -336,190 +336,183 @@ public class MyGameGUI extends JFrame implements MouseListener {
      * Double buffer for the paint function
      */
     @Override
-    public void paint(Graphics g){
-        Image img =createImage(1300,700);
+    public void paint(Graphics g) {
+        Image img = createImage(1300, 700);
         Graphics gImg = img.getGraphics();
         paintComponents(gImg);
-        g.drawImage(img,0,0,this);
+        g.drawImage(img, 0, 0, this);
 
     }
+
     /**
-     *   paint the graph using oval for nodes(vertices) and lines as edges,
-     *   fruits as targets(apple means uphill and banana means downhill)
-     *   the robots(androids) mission is to collect the fruits
+     * paint the graph using oval for nodes(vertices) and lines as edges,
+     * fruits as targets(apple means uphill and banana means downhill)
+     * the robots(androids) mission is to collect the fruits
      */
     @Override
     public void paintComponents(Graphics g) {                                 //swing implementation of paint method
         super.paint(g);
-           Collection<node_data> ver = this.gra.getV();
-           Iterator<node_data> it = ver.iterator();
-           while (it.hasNext()) {
-               node_data nd = it.next();
-               Point3D p = nd.getLocation();
+        Collection<node_data> ver = this.gra.getV();
+        Iterator<node_data> it = ver.iterator();
+        while (it.hasNext()) {
+            node_data nd = it.next();
+            Point3D p = nd.getLocation();
 
-               g.setColor(Color.BLUE);
-               g.fillOval(((int) (rangeX(p.x()) - kRADIUS)), ((int) (rangeY(p.y()) - kRADIUS)),
-                       2 * kRADIUS, 2 * kRADIUS);
-               g.setColor(Color.BLACK);
-               g.drawString(Integer.toString(nd.getKey()), (int) (rangeX(p.x())), -10 + (int) (rangeY(p.y())));
-               path.put(p, nd.getKey());
+            g.setColor(Color.BLUE);
+            g.fillOval(((int) (rangeX(p.x()) - kRADIUS)), ((int) (rangeY(p.y()) - kRADIUS)),
+                    2 * kRADIUS, 2 * kRADIUS);
+            g.setColor(Color.BLACK);
+            g.drawString(Integer.toString(nd.getKey()), (int) (rangeX(p.x())), -10 + (int) (rangeY(p.y())));
+            path.put(p, nd.getKey());
 
-               Iterator<edge_data> it1 = this.gra.getE(nd.getKey()).iterator();
-               while (it1.hasNext()) {
-                   edge_data ed = it1.next();
-                   Point3D psrc = this.gra.getNode(ed.getSrc()).getLocation();
-                   Point3D pdest = this.gra.getNode(ed.getDest()).getLocation();
+            Iterator<edge_data> it1 = this.gra.getE(nd.getKey()).iterator();
+            while (it1.hasNext()) {
+                edge_data ed = it1.next();
+                Point3D psrc = this.gra.getNode(ed.getSrc()).getLocation();
+                Point3D pdest = this.gra.getNode(ed.getDest()).getLocation();
 
-                   g.setColor(Color.YELLOW);
-                   g.fillOval((int) (Math.round(((rangeX(psrc.x()) * (0.1) + rangeX(pdest.x()) * (0.9)))) - kRADIUS),
-                           (int) (Math.round((rangeY(psrc.y()) * (0.1) + rangeY(pdest.y()) * (0.9))) - kRADIUS), 2 * kRADIUS, 2 * kRADIUS);
+                g.setColor(Color.YELLOW);
+                g.fillOval((int) (Math.round(((rangeX(psrc.x()) * (0.1) + rangeX(pdest.x()) * (0.9)))) - kRADIUS),
+                        (int) (Math.round((rangeY(psrc.y()) * (0.1) + rangeY(pdest.y()) * (0.9))) - kRADIUS), 2 * kRADIUS, 2 * kRADIUS);
 
-                   g.setColor(Color.RED);
-                   g.drawLine((int) rangeX(pdest.x()), (int) rangeY(pdest.y()), (int) rangeX(psrc.x()), (int) rangeY(psrc.y()));
+                g.setColor(Color.RED);
+                g.drawLine((int) rangeX(pdest.x()), (int) rangeY(pdest.y()), (int) rangeX(psrc.x()), (int) rangeY(psrc.y()));
 
-                   double dist = this.gra.getEdge(ed.getSrc(), ed.getDest()).getWeight();
-                   g.drawString(String.format("%.2f", dist),
-                           (int) (Math.round(((rangeX(psrc.x()) * (0.3) + rangeX(pdest.x()) * (0.7)))) - kRADIUS),
-                           (int) (Math.round((rangeY(psrc.y()) * (0.3) + rangeY(pdest.y()) * (0.7))) - kRADIUS));
+                double dist = this.gra.getEdge(ed.getSrc(), ed.getDest()).getWeight();
+                g.drawString(String.format("%.2f", dist),
+                        (int) (Math.round(((rangeX(psrc.x()) * (0.3) + rangeX(pdest.x()) * (0.7)))) - kRADIUS),
+                        (int) (Math.round((rangeY(psrc.y()) * (0.3) + rangeY(pdest.y()) * (0.7))) - kRADIUS));
 
-               }
+            }
 
-              
-           }
+
+        }
 /**
  *
  *   print robots
  */
-            for (int i = 0; i < players; i++) {
-                try {
-                        String robot_json = robots.get(i);
-                        JSONObject line = new JSONObject(robot_json);
-                        JSONObject ttt = line.getJSONObject("Robot");
-                        String pos = ttt.getString("pos");
-                        int rid = ttt.getInt("id");
-                        this.id = rid;
+        for (int i = 0; i < players; i++) {
+            try {
+                String robot_json = robots.get(i);
+                JSONObject line = new JSONObject(robot_json);
+                JSONObject ttt = line.getJSONObject("Robot");
+                String pos = ttt.getString("pos");
+                int rid = ttt.getInt("id");
+                this.id = rid;
 
-                        Point3D pBefore = new Point3D(pos);
-                        Point3D pAfter = new Point3D(rangeX(pBefore.x()), rangeY(pBefore.y()));
+                Point3D pBefore = new Point3D(pos);
+                Point3D pAfter = new Point3D(rangeX(pBefore.x()), rangeY(pBefore.y()));
 
-                        BufferedImage rob = ImageIO.read(new File("rob.png"));
-                        Image newRob = rob.getScaledInstance(20, 20, Image.SCALE_DEFAULT);
-                        g.drawImage(newRob, (int) pAfter.x() - kRADIUS, (int) pAfter.y() - kRADIUS, null);
-                        //  }
+                BufferedImage rob = ImageIO.read(new File("rob.png"));
+                Image newRob = rob.getScaledInstance(20, 20, Image.SCALE_DEFAULT);
+                g.drawImage(newRob, (int) pAfter.x() - kRADIUS, (int) pAfter.y() - kRADIUS, null);
+                //  }
 
-                    } catch(Exception e){
-                        e.printStackTrace();
+            } catch (Exception e) {
+                e.printStackTrace();
 
-                }
             }
+        }
         /**
          *
          *   print fruits
          */
-            for (int i = 0; i < fruits.size(); i++) {
-                try {
-                            String fruit_json = fruits.get(i);
-                            JSONObject line = new JSONObject(fruit_json);
-                            JSONObject f = line.getJSONObject("Fruit");
-                            String pos = f.getString("pos");
-                            int type = f.getInt("type");
-                            Point3D pBefore = new Point3D(pos);
-                            Point3D pAfter = new Point3D(rangeX(pBefore.x()), rangeY(pBefore.y()));
+        for (int i = 0; i < fruits.size(); i++) {
+            try {
+                String fruit_json = fruits.get(i);
+                JSONObject line = new JSONObject(fruit_json);
+                JSONObject f = line.getJSONObject("Fruit");
+                String pos = f.getString("pos");
+                int type = f.getInt("type");
+                Point3D pBefore = new Point3D(pos);
+                Point3D pAfter = new Point3D(rangeX(pBefore.x()), rangeY(pBefore.y()));
 
-                            BufferedImage apple = ImageIO.read(new File("apple2.png"));
-                            Image newApple = apple.getScaledInstance(20, 20, Image.SCALE_DEFAULT);
-                            BufferedImage banana = ImageIO.read(new File("banana.png"));
-                            Image newBanana = banana.getScaledInstance(20, 20, Image.SCALE_DEFAULT);
-                            if (type > 0) {           //apple = 1
-                                g.drawImage(newApple, (int) pAfter.x() - kRADIUS, (int) pAfter.y() - kRADIUS, null);
-                            } else {               //banana = -1
-                                g.drawImage(newBanana, (int) pAfter.x() - kRADIUS, (int) pAfter.y() - kRADIUS, null);
-                            }
+                BufferedImage apple = ImageIO.read(new File("apple2.png"));
+                Image newApple = apple.getScaledInstance(20, 20, Image.SCALE_DEFAULT);
+                BufferedImage banana = ImageIO.read(new File("banana.png"));
+                Image newBanana = banana.getScaledInstance(20, 20, Image.SCALE_DEFAULT);
+                if (type > 0) {           //apple = 1
+                    g.drawImage(newApple, (int) pAfter.x() - kRADIUS, (int) pAfter.y() - kRADIUS, null);
+                } else {               //banana = -1
+                    g.drawImage(newBanana, (int) pAfter.x() - kRADIUS, (int) pAfter.y() - kRADIUS, null);
+                }
 
 
-                    } catch(Exception e){
-                        e.printStackTrace();
-                    }
-
+            } catch (Exception e) {
+                e.printStackTrace();
             }
+
+        }
         /**
          *   print seconds left till game ends
          */
-            try {
-                if(Auto) {
-                    String time = "Time till game Over: " + rg.scenario.game.timeToEnd() / 1000 + "";
-                    g.drawString(time, 650, 50);
-                }
-                if(Manu) {
-                    String time = "Time till game Over: " + s.game.timeToEnd() / 1000 + "";
-                    g.drawString(time, 650, 50);
-                }
-                /**
-                 *   print game score
-                 */
-                if(EndAuto){
-                    String end = "game Over: " + rg.scenario.game.toString() ;
-                    g.drawString(end,550,100);
-                }
-                if(EndManu){
-                    String end = "game Over: " + s.game.toString();
-                    g.drawString(end,550,100);
-                }
-            }catch(Exception e){
+        try {
+            if (Auto) {
+                String time = "Time till game Over: " + rg.scenario.game.timeToEnd() / 1000 + "";
+                g.drawString(time, 650, 75);
+            }
+            if (Manu) {
+                String time = "Time till game Over: " + s.game.timeToEnd() / 1000 + "";
+                g.drawString(time, 650, 75);
+            }
+            /**
+             *   print game score
+             */
+            if (EndAuto) {
+                String end = "game Over: " + rg.scenario.game.toString();
+                g.drawString(end, 450, 50);
+            }
+            if (EndManu) {
+                String end = "game Over: " + s.game.toString();
+                g.drawString(end, 450, 50);
+            }
+        } catch (Exception e) {
             e.printStackTrace();
-            }
-            }
-
+        }
+    }
 
 
     /**
-     *   Thread to print the movement of the robot every few milliseconds 'Auto thread'
-     *   different threads because auto run with a special scenario background support.
+     * Thread to print the movement of the robot every few milliseconds 'Auto thread'
+     * different threads because auto run with a special scenario background support.
      */
-    public void ThreadPaintAuto(game_service game)
-    {
+    public void ThreadPaintAuto(game_service game) {
 
         thread = new Thread(() -> {
-            while(rg.scenario.game.isRunning())
-            {
-                    try {
-                            rg.scenario.game.move();
-                            robots = rg.scenario.game.getRobots();
-                            fruits = rg.scenario.game.getFruits();
+            while (rg.scenario.game.isRunning()) {
+                try {
+                    //          rg.scenario.game.move();
+                    robots = rg.scenario.game.getRobots();
+                    fruits = rg.scenario.game.getFruits();
 
-                        Thread.sleep(100);
-                     repaint();
-                    }
-
-                    catch (Exception e) {
-                        e.printStackTrace();
-                    }
+                    Thread.sleep(100);
+                    repaint();
+                } catch (Exception e) {
+                    e.printStackTrace();
                 }
-                EndAuto = true;
-                repaint();
+            }
+            EndAuto = true;
+            repaint();
             thread.interrupt();
         });
 
         thread.start();
     }
+
     /**
-     *   Thread to print the movement of the robot every few milliseconds 'Manual thread'
+     * Thread to print the movement of the robot every few milliseconds 'Manual thread'
      */
-    public void ThreadPaintManu(game_service game)
-    {
+    public void ThreadPaintManu(game_service game) {
 
         thread = new Thread(() -> {
-            while(s.game.isRunning())
-            {
+            while (s.game.isRunning()) {
                 try {
-                        s.game.move();
-                        robots = s.game.getRobots();
-                        fruits = s.game.getFruits();
+                    s.game.move();
+                    robots = s.game.getRobots();
+                    fruits = s.game.getFruits();
                     Thread.sleep(1000);
-            repaint();
-                }
-
-                catch (Exception e) {
+                    repaint();
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
             }
@@ -530,44 +523,46 @@ public class MyGameGUI extends JFrame implements MouseListener {
 
         thread.start();
     }
-    /**
-     *   Initiate the scenario of the game
-     */
-        public void myGame() {
 
-            int scenario_num = Integer.parseInt(JOptionPane.showInputDialog("Enter scenario number between 0-23"));
-            this.scenario = scenario_num;
-            s = new Scenario(scenario);
-            robots = s.game.getRobots();
-            fruits = s.game.getFruits();
-            this.gra = s.gr;
-            this.ga.init(this.gra);
-            game = s.game;
-            players = s.robot.size();
+    /**
+     * Initiate the scenario of the game
+     */
+    public void myGame() {
+
+        int scenario_num = Integer.parseInt(JOptionPane.showInputDialog("Enter scenario number between 0-23"));
+        this.scenario = scenario_num;
+        s = new Scenario(scenario);
+        robots = s.game.getRobots();
+        fruits = s.game.getFruits();
+        this.gra = s.gr;
+        this.ga.init(this.gra);
+        game = s.game;
+        players = s.robot.size();
 
 /**
  *   Update nodes to gui window
  */
-            Collection<node_data> c = this.gra.getV();
-            Iterator<node_data> itrV = c.iterator();
-            while(itrV.hasNext()) {
-                node_data n = itrV.next();
-                Point3D p = n.getLocation();
-                double x = p.x();
-                double y = p.y();
-                if(x<rx.get_min())
-                    rx.set_min(x);
-                else if(x>rx.get_max())
-                    rx.set_max(x);
-                if(y<ry.get_min())
-                    ry.set_min(y);
-                else if(y>ry.get_max())
-                    ry.set_max(y);
-            }
-
+        Collection<node_data> c = this.gra.getV();
+        Iterator<node_data> itrV = c.iterator();
+        while (itrV.hasNext()) {
+            node_data n = itrV.next();
+            Point3D p = n.getLocation();
+            double x = p.x();
+            double y = p.y();
+            if (x < rx.get_min())
+                rx.set_min(x);
+            else if (x > rx.get_max())
+                rx.set_max(x);
+            if (y < ry.get_min())
+                ry.set_min(y);
+            else if (y > ry.get_max())
+                ry.set_max(y);
         }
+
+    }
+
     /**
-     *   Manual drive of the robots using the input window
+     * Manual drive of the robots using the input window
      */
     public void manuDrive() {
         s.game.startGame();
@@ -582,14 +577,14 @@ public class MyGameGUI extends JFrame implements MouseListener {
                         JSONObject line = new JSONObject(robot_json);
                         JSONObject ttt = line.getJSONObject("Robot");
                         int rid = ttt.getInt("id");
-                        String des =JOptionPane.showInputDialog(rootPane,"Enter destination");
-                        if(des!=null) {
+                        String des = JOptionPane.showInputDialog(rootPane, "Enter destination");
+                        if (des != null) {
                             int dest = Integer.parseInt(des);
-                     //   if(pick!=null) {
+                            //   if(pick!=null) {
                             game.chooseNextEdge(rid, dest);
-                            s.game.move();
+                            //                    s.game.move();
                         }
-                   //     }
+                        //     }
 
                     } catch (JSONException e) {
                         e.printStackTrace();
@@ -604,38 +599,38 @@ public class MyGameGUI extends JFrame implements MouseListener {
 
 
     public static void main(String[] args) {
-            MyGameGUI mg = new MyGameGUI();
+        MyGameGUI mg = new MyGameGUI();
 
-        }
+    }
 
     /**
-     *   Manual drive of the robots using the mouse clicks +++needs more work
+     * Manual drive of the robots using the mouse clicks +++needs more work
      */
     @Override
     public void mouseClicked(MouseEvent e) {
 
 
         try {
-                    int x = e.getX();
-                    int y = e.getY();
-                    Point3D p3 = new Point3D(x, y, 0);
-                    double min_dist = (kRADIUS * 3);
-                    double best_dist = 100000;
+            int x = e.getX();
+            int y = e.getY();
+            Point3D p3 = new Point3D(x, y, 0);
+            double min_dist = (kRADIUS * 3);
+            double best_dist = 100000;
 
-                    Collection<node_data> ver = gra.getV();
-                    Iterator<node_data> itr = ver.iterator();
-                    while(itr.hasNext()) {
-                        node_data n = itr.next();
-                        Point3D p = n.getLocation();
-                        double x1 =(rangeX(p.x()));
-                        double y1 =(rangeY(p.y()));
-                        Point3D pTemp = new Point3D(x1,y1,0);
-                        double dist = pTemp.distance2D(p3);
-                        if(dist<min_dist && dist<best_dist) {
-                            best_dist = dist;
-                            pick = n;
-                        }
-                    }
+            Collection<node_data> ver = gra.getV();
+            Iterator<node_data> itr = ver.iterator();
+            while (itr.hasNext()) {
+                node_data n = itr.next();
+                Point3D p = n.getLocation();
+                double x1 = (rangeX(p.x()));
+                double y1 = (rangeY(p.y()));
+                Point3D pTemp = new Point3D(x1, y1, 0);
+                double dist = pTemp.distance2D(p3);
+                if (dist < min_dist && dist < best_dist) {
+                    best_dist = dist;
+                    pick = n;
+                }
+            }
 
 
         } catch (Exception ex) {
