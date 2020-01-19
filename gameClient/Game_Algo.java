@@ -1,38 +1,40 @@
 package gameClient;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import Server.Game_Server;
 import Server.game_service;
 import dataStructure.DGraph;
 import dataStructure.edge_data;
 import dataStructure.node_data;
-import oop_dataStructure.oop_edge_data;
-import oop_dataStructure.oop_graph;
 import utils.Point3D;
-
+/**
+ * This static class represents the algorithmic part of the game. 
+ * all logical functions are implemented here. 
+ */
 public class Game_Algo {
+	public static final double EPS = 0.000001;
 
-
-	public static final double EPS = 0.0001;
-
-
+	/**
+	 * add robot near to the fruits.
+	 * @param fruit
+	 * @param robot
+	 * @param game
+	 */
 	public static void addRobotNearFruit(int robot, ArrayList<Fruit> fruit, game_service game) {
 		for (int i = 0; i < robot; i++) {
 			game.addRobot(fruit.get(i%fruit.size()).getEdge().getSrc());
 		}
 	}
-
-
-
-
-
+	/**
+	 * The function returns the edge on which the fruit is placed
+	 * @param f
+	 * @param g
+	 */
 	public static edge_data getFruitEdge(String f,DGraph g) throws JSONException {
 		JSONObject fruit = new JSONObject(f); //deserialize
 		JSONObject fruit2 = fruit.getJSONObject("Fruit");
@@ -63,26 +65,12 @@ public class Game_Algo {
 		}
 		return null;
 	}
-
-	public static List<Integer> nextNode2(DGraph g, int src) {
-		game_service game = Game_Server.getServer(2);
-		List<Integer> n = new ArrayList<Integer>();
-		n.add(src);
-		Iterator<String> f_iter = game.getFruits().iterator();
-		while(f_iter.hasNext()) {
-			game.move();
-			String f = f_iter.next();
-			try {
-				edge_data t = getFruitEdge(f,g);
-				n.add(g.getNode(t.getSrc()).getKey());
-				n.add(g.getNode(t.getDest()).getKey());
-				System.out.println(g.getNode(t.getSrc()).getKey()+"-->"+g.getNode(t.getDest()).getKey());
-			} catch (JSONException e) {
-				e.printStackTrace();
-			}
-		}	
-		return n;
-	}
+	
+	/**
+	 * The function returns the next node on the path to a fruit.
+	 * @param src
+	 * @param scenario
+	 */
 	public static int nextNode(Scenario scenario, int src) {
 		int ans = -1;
 		int dist = 0;
@@ -122,7 +110,7 @@ public class Game_Algo {
         if(n!=null&&n.size()==1) {
         	ans = tmin.getDest();
         }
-
+        
 		return ans;
 	}
 
